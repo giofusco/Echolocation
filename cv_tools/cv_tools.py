@@ -79,7 +79,7 @@ def segment_rod(frame : np.matrix, th1 : int = 250, th2 : int = 295, ts1 : int =
     # mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
     # mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
 
-    cv2.imshow("Mask", mask)
+    # cv2.imshow("Mask", mask)
     contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     largest_c = find_largest_contour(contours)
     if largest_c >= 0:

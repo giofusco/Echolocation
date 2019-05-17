@@ -15,7 +15,7 @@ def get_target_position(frame: np.matrix, center: tuple, scale: float=2025, rang
         angle = 360 - angle
     n = np.array([ np.cos(np.deg2rad(angle)), -np.sin(np.deg2rad(angle))]) #change of sign for sign because of image ref. system
     d = scale * range
-    print(center, n, n*d)
+    # print(center, n, n*d)
     target_pt = center + n * d
     return target_pt, angle, pt, centroid
 

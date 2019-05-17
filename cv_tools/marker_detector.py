@@ -19,15 +19,28 @@ class MarkerDetector:
         # aruco_params.cornerRefinementMinAccuracy = 0.1
         # aruco_params.polygonalApproxAccuracyRate = 0.1
 
-    def detect_marker(self, frame):
-
+    def detect_marker(self, frame, id=1001):
+        pt = []
         corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(frame, self.aruco_dict, parameters=self.aruco_params)
-        print(ids)
-        if not corners == []:
-            rvecs, tvecs, _objPoints = cv2.aruco.estimatePoseSingleMarkers(corners, 0.1, cameraMatrix=self.mtx,
+        idx = -1
+        res = (np.where(ids == id))
+        print(len(res[0]))
+        if len(res[0]) > 0:
+            idx = np.where(ids == id)[0][0]
+
+        if not corners == [] and idx>=0:
+            rvecs, tvecs, _objPoints = cv2.aruco.estimatePoseSingleMarkers(corners[idx], 0.1, cameraMatrix=self.mtx,
                                                                        distCoeffs=self.dist)
             cv2.aruco.drawDetectedMarkers(frame, corners)
-            cv2.aruco.drawAxis(frame, self.mtx, self.dist, rvecs, tvecs, 2)
+            cv2.aruco.drawAxis(frame, self.mtx, self.dist, rvecs[idx], tvecs[idx], .1)
+            R = cv2.Rodrigues(rvecs[idx])
+            # print (R)
+            R = np.asmatrix(R[0])
+            # cv2.aruco.drawAxis(frame, mtx, dist, rvecs[0], tvecs[0], 1)
+            pt = R.dot(np.transpose([0, 1, 0])) + tvecs[idx]
+            pt = np.resize(pt, 3)
+            print("*", pt)
+        return pt
         # rotM = np.zeros(shape=(3, 3))
         # cv2.Rodrigues(rvecs, rotM, jacobian=0)
         # retval, mtxR, mtxQ, Qx, Qy, Qz = cv2.RQDecomp3x3(rotM)

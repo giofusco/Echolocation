@@ -7,12 +7,12 @@ from cv_tools import marker_detector as md
 
 video = './videos/GOPR3954.MP4'
 
-center_ratio = find_center.find_center_of_rotation(video, 30, 0)
+# center_ratio = find_center.find_center_of_rotation(video, 30, 0)
 # print(center_ratio)
-# center_ratio = (0.5590342613731353, 0.5702927276884127)
+center_ratio = (0.5590342613731353, 0.5702927276884127)
 
 
-center_ratio = find_center.fine_tune_center(video, center_ratio)
+# center_ratio = find_center.fine_tune_center(video, center_ratio)
 marker_det = md.MarkerDetector()
 cap = cv2.VideoCapture(video)
 num_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
@@ -29,15 +29,22 @@ while True:
             undist = cvt.undo_distortion(frame)
             orig_size = undist.shape
             undist = cv2.resize(undist, (int(frame.shape[1] / 3), int(frame.shape[0] / 3)))
-            marker_det.detect_marker(undist)
+            nose_pt = marker_det.detect_marker(undist)
             center = (int(center_ratio[0]*undist.shape[1]), int((center_ratio[1]*undist.shape[0])))
-            pt, angle, rod_pt, centroid = find_target_position.get_target_position(undist, center, scale/3, 0.2)
-            print(pt)
+            target_pt, angle, rod_pt, centroid = find_target_position.get_target_position(undist, center, scale/3, 0.2)
+            # print(nose_pt)
+            if len(nose_pt) > 0:
+                h_shape = (undist.shape[0]/2, undist.shape[1]/2, 0)
+                nose_pt_px = (nose_pt*scale/9 + h_shape)
+                print(nose_pt_px)
+                cv2.circle(undist, (int(nose_pt_px[0]), int(nose_pt_px[1])), 5, (0, 255, 255), 10)
+
             cv2.putText(undist, str(round(angle,2)), center, cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,0))
-            cv2.circle(undist, (int(pt[0]), int(pt[1])), 5, (0, 255, 255), 10)
+
             # cv2.line(undist, center, (int(pt[0]), int(pt[1])), (0,255,255), 2)
             cv2.circle(undist, center, 5, (0,255,0), 6)
             cv2.imshow("Frame", undist)
             cv2.waitKey(1)
     if cnt == num_frames:
+        print("Done. Exiting.")
         break
