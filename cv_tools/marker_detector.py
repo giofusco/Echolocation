@@ -1,6 +1,8 @@
 from cv_tools import cv_tools as cvt
 import numpy as np
 import cv2
+
+
 class MarkerDetector:
 
     def __init__(self):
@@ -19,28 +21,24 @@ class MarkerDetector:
         # aruco_params.cornerRefinementMinAccuracy = 0.1
         # aruco_params.polygonalApproxAccuracyRate = 0.1
 
-    def detect_marker(self, frame, id=1001):
-        pt = []
-        corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(frame, self.aruco_dict, parameters=self.aruco_params)
-        idx = -1
+    def detect_marker(self, frame, rescale_factor= 1/3, id=1001):
+        pt_top = None
+        pt_center = None
+        frame_scaled = cv2.resize(frame, (int(frame.shape[1] * rescale_factor), int(frame.shape[0] * rescale_factor)))
+
+        corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(frame_scaled, self.aruco_dict, parameters=self.aruco_params)
+
+
         res = (np.where(ids == id))
-        print(len(res[0]))
+        frame_center = (int(frame_scaled.shape[1]/2), int(frame_scaled.shape[0]/2))
+
         if len(res[0]) > 0:
             idx = np.where(ids == id)[0][0]
-
-        if not corners == [] and idx>=0:
-            rvecs, tvecs, _objPoints = cv2.aruco.estimatePoseSingleMarkers(corners[idx], 0.1, cameraMatrix=self.mtx,
+            corners_orig = corners[idx] * 1 / rescale_factor
+            rvecs, tvecs, _objPoints = cv2.aruco.estimatePoseSingleMarkers(corners_orig, 0.1, cameraMatrix=self.mtx,
                                                                        distCoeffs=self.dist)
-            cv2.aruco.drawDetectedMarkers(frame, corners)
-            cv2.aruco.drawAxis(frame, self.mtx, self.dist, rvecs[idx], tvecs[idx], .1)
-            R = cv2.Rodrigues(rvecs[idx])
-            # print (R)
-            R = np.asmatrix(R[0])
-            # cv2.aruco.drawAxis(frame, mtx, dist, rvecs[0], tvecs[0], 1)
-            pt = R.dot(np.transpose([0, 1, 0])) + tvecs[idx]
-            pt = np.resize(pt, 3)
-            print("*", pt)
-        return pt
-        # rotM = np.zeros(shape=(3, 3))
-        # cv2.Rodrigues(rvecs, rotM, jacobian=0)
-        # retval, mtxR, mtxQ, Qx, Qy, Qz = cv2.RQDecomp3x3(rotM)
+            pt, _ = cv2.projectPoints(np.float32([[0, 0, 0], [0.1,0,0]]), rvecs, tvecs, self.mtx, self.dist)
+            pt_center = np.resize(pt[0], 2)
+            pt_top = np.resize(pt[1], 2)
+
+        return pt_center, pt_top

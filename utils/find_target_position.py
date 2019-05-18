@@ -13,9 +13,11 @@ def get_target_position(frame: np.matrix, center: tuple, scale: float=2025, rang
     angle = math.acos(dot) * 180 / 3.14
     if centroid[1] > center[1]: # if rod is in 3rd or 4th quadrant, undo 180 wrapping
         angle = 360 - angle
+
     n = np.array([ np.cos(np.deg2rad(angle)), -np.sin(np.deg2rad(angle))]) #change of sign for sign because of image ref. system
     d = scale * range
-    # print(center, n, n*d)
+
     target_pt = center + n * d
+    #cv2.circle(frame, (int(target_pt[0]), int(target_pt[1])), 2, (0,255,255), 4)
     return target_pt, angle, pt, centroid
 

@@ -50,7 +50,8 @@ def find_center_of_rotation(video: str, max_dist: float = 5, min_consecutive: in
 
         if cnt >= num_frames:
             break
-
+    print_progress_bar(num_frames, num_frames, prefix='Progress:',
+                       suffix='Complete, numPoints: ' + str(pointCollector.num_points), length=50)
     a = fe.fitEllipse(np.asarray(pointCollector.pt_x), np.asarray(pointCollector.pt_y))
     center = fe.ellipse_center(a)
 
