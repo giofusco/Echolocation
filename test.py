@@ -58,7 +58,6 @@ while True:
             if ready_to_start:
                 ready_to_start = False
                 trial_started = True
-                frame_cnt = 0
 
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             gray = cv2.resize(gray, (int(frame.shape[1] / 3), int(frame.shape[0] / 3)))
@@ -88,7 +87,7 @@ while True:
                    str(gamma) + '\t' + str(theta) + '\t' + str(pt_target) + '\t' + str(pt_head) + '\t' + str(pt_nose) \
                    + '\n'
 
-        if trial_started: # write trial start header
+        if trial_started:
 
             log.write(log_line)
             header = "trial #" + str(trial_cnt)
@@ -105,6 +104,7 @@ while True:
                         .45, (125, 125, 0))
             led_triggered = False
             trial_started = False
+            ready_to_start = False
 
         elif trial_started is False:
             cv2.putText(vis, "waiting for trial start...", (10, 20), cv2.FONT_HERSHEY_DUPLEX,
@@ -113,8 +113,8 @@ while True:
         print_progress_bar(frame_cnt + 1, num_frames, prefix='Progress:',
                            suffix='Complete', length=50)
 
-        # cv2.imshow("Frame", vis)
-        # cv2.waitKey(1)
+        cv2.imshow("Frame", vis)
+        cv2.waitKey(1)
     if frame_cnt == num_frames:
-        print("All done, bye.")
+        print("\n All done, bye.")
         break
