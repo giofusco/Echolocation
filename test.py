@@ -13,7 +13,7 @@ center_file = './results/' + video + '_center.txt'
 log_file = './results/' + video + '_log.txt'
 
 log = open(log_file, 'w')
-log_header = 'ts \t trial # \t led \t alpha \t gamma \t theta \t target_pos \t center_pos \t pointer_pt'
+log_header = 'ts \t trial # \t led \t alpha \t gamma \t theta \t target_pos \t center_pos \t pointer_pt \n'
 log.write(log_header)
 
 center_ratio = analysis.find_center(video_src, center_file)
