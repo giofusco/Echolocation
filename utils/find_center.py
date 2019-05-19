@@ -69,7 +69,7 @@ def find_center_of_rotation(video: str, max_dist: float = 5, min_consecutive: in
 def grab_next_frame(cap : cv2.VideoCapture) -> np.matrix:
     frame = None
     cnt = 0
-    while frame is None or cnt < 240:
+    while frame is None or cnt < 600:
         ret, frame = cap.read()
         cnt += 1
         if cnt == 1000 and frame is None:

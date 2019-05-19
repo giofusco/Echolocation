@@ -2,8 +2,9 @@ import cv2
 from cv_tools import cv_tools as cvt
 import numpy as np
 from utils import find_center
+from utils.find_center import find_center_of_rotation, fine_tune_center
 from utils import find_target_position
-from cv_tools import marker_detector as md
+
 from math import acos
 
 
@@ -16,9 +17,11 @@ def find_center(video_src, center_file):
         print(data[0])
         center_ratio[0] = float(data[0])
         center_ratio[1] = float(data[1])
+        center_ratio = fine_tune_center(video_src, center_ratio)
     except FileNotFoundError:
-        center_ratio = find_center.find_center_of_rotation(video_src, 30, 0)
-        center_ratio = find_center.fine_tune_center(video_src, center_ratio)
+        fh = open(center_file, 'w')
+        center_ratio = find_center_of_rotation(video_src, 30, 0)
+        center_ratio = fine_tune_center(video_src, center_ratio)
         fh = open(center_file, 'w')
         fh.write(str(center_ratio[0]) + "\n")
         fh.write(str(center_ratio[1]) + "\n")
@@ -56,9 +59,11 @@ def process_frame(frame, center_ratio, marker_det, scale):
         head_pose_vec = pt_nose - pt_head
         gt_vec = pt_head - pt_target
         dot = -gt_vec[0] / cv2.norm(gt_vec)
-        alpha = acos(dot) * 180 / 3.14
+        # alpha = acos(dot) * 180 / 3.14
+        alpha = cv2.fastAtan2(gt_vec[1],-gt_vec[0])
         dot = head_pose_vec[0] / cv2.norm(head_pose_vec)
-        gamma = acos(dot) * 180 / 3.14
+        # gamma = acos(dot) * 180 / 3.14
+        gamma = cv2.fastAtan2(-head_pose_vec[1], head_pose_vec[0])
         cv2.putText(undist, str(alpha), (int(pt_head[0]), int(pt_head[1])), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                     (0, 200, 50))
         cv2.putText(undist, str(gamma), (int(pt_nose[0]), int(pt_nose[1])), cv2.FONT_HERSHEY_SIMPLEX, 0.5,

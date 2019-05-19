@@ -6,7 +6,7 @@ from utils import analysis
 
 scale = 2025 # pixels x meter @ 1635 x 1053
 
-video = 'GOPR3955.MP4'
+video = 'GOPR3961.MP4'
 
 video_src = './videos/' + video
 center_file = './results/' + video + '_center.txt'
