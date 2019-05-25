@@ -6,9 +6,9 @@ from utils import analysis
 
 scale = 2025 # pixels x meter @ 1635 x 1053
 
-video = 'GOPR3961.MP4'
+video = 'GOPR3956.MP4'
 
-video_src = './videos/' + video
+video_src = '../../Subj01_DK/Video/' + video
 center_file = './results/' + video + '_center.txt'
 log_file = './results/' + video + '_log.txt'
 
@@ -47,7 +47,7 @@ while True:
     frame_cnt += 1
     if frame is not None:
 
-        tstamp = fps / 1000 * frame_cnt
+        tstamp = 1 / fps * frame_cnt
 
         vis, alpha, gamma, theta, pt_target, pt_head, pt_nose = analysis.process_frame(frame, center_ratio, marker_det,
                                                                                        scale)
