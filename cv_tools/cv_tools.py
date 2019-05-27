@@ -111,6 +111,25 @@ def get_rod_reference_point(frame : np.matrix):
         # cv2.putText(vis, str(rrect[2]), (int(pt[0]), int(pt[1])), cv2.FONT_HERSHEY_COMPLEX, 1.2, (255,0,0))
     return pt, centroid, vis
 
+def is_led_on(frame, prev_brightness):
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    gray = cv2.resize(gray, (int(frame.shape[1] / 3), int(frame.shape[0] / 3)))
+    led_quad = gray[280:320, 500:560]
+
+    led_triggered = False
+    if prev_brightness < 0:
+        prev_brightness = cv2.mean(led_quad)[0]
+        led_delta = 0
+        return led_triggered, prev_brightness
+    else:
+        curr_brightness = cv2.mean(led_quad)[0]
+        led_delta = curr_brightness - prev_brightness
+        if led_delta > 30:
+            cv2.rectangle(frame, (500, 280), (560, 320), (0, 0, 255), 2)
+            led_triggered = True
+        else:
+            led_triggered = False
+    return led_triggered, curr_brightness
 
 def gopro_intrinsic() -> np.matrix:
     # return np.matrix([[1.06158880e+03, 0.00000000e+00, 9.63653719e+02],

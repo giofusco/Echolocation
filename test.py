@@ -8,7 +8,8 @@ scale = 2025 # pixels x meter @ 1635 x 1053
 
 video = 'GOPR3956.MP4'
 
-video_src = '../../Subj01_DK/Video/' + video
+#video_src = '../../Subj01_DK/Video/' + video
+video_src = 'videos/' + video
 center_file = './results/' + video + '_center.txt'
 log_file = './results/' + video + '_log.txt'
 

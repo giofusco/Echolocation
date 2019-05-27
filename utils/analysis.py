@@ -1,11 +1,9 @@
 import cv2
 from cv_tools import cv_tools as cvt
 import numpy as np
-from utils import find_center
 from utils.find_center import find_center_of_rotation, fine_tune_center
 from utils import find_target_position
-
-from math import acos
+import math
 
 
 def find_center(video_src, center_file):
@@ -14,19 +12,25 @@ def find_center(video_src, center_file):
     try:
         fh = open(center_file, 'r')
         data = fh.readlines()
-        print(data[0])
-        center_ratio[0] = float(data[0])
-        center_ratio[1] = float(data[1])
-        center_ratio = fine_tune_center(video_src, center_ratio)
+        if np.size(data) > 0:
+            center_ratio[0] = float(data[0])
+            center_ratio[1] = float(data[1])
+            center_ratio = fine_tune_center(video_src, center_ratio)
+        else:
+            raise FileNotFoundError
     except FileNotFoundError:
         fh = open(center_file, 'w')
-        center_ratio = find_center_of_rotation(video_src, 30, 0)
+        center_ratio = find_center_of_rotation(video_src, 10000, 0)
+        fh.write(str(center_ratio[0]) + "\n")
+        fh.write(str(center_ratio[1]) + "\n")
+        fh.close()
         center_ratio = fine_tune_center(video_src, center_ratio)
         fh = open(center_file, 'w')
         fh.write(str(center_ratio[0]) + "\n")
         fh.write(str(center_ratio[1]) + "\n")
         fh.close()
     return center_ratio
+
 
 def process_frame(frame, center_ratio, marker_det, scale):
     alpha = None
@@ -72,3 +76,5 @@ def process_frame(frame, center_ratio, marker_det, scale):
     cv2.circle(undist, center, 5, (0,255,0), 6)
 
     return undist, alpha, gamma, theta, pt_target, pt_head, pt_nose
+
+
